@@ -13,6 +13,7 @@ frontend/dist/
 .env
 .env.local
 .env.*.local
+.agents/
 
 # IDE
 .vscode/
