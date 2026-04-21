@@ -1,0 +1,14 @@
+{
+  "name": "nezgame-monorepo",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:server": "npm run dev --prefix server",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:server": "npm run build --prefix server",
+    "db:migrate": "npm run db:migrate --prefix server",
+    "db:seed": "npm run db:seed --prefix server",
+    "db:push": "npm run db:push --prefix server",
+    "install:all": "npm install --prefix frontend && npm install --prefix server"
+  }
+}

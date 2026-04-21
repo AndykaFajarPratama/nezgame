@@ -1,0 +1,16 @@
+{
+  "name": "NezGame - Top Up Game Tercepat",
+  "short_name": "NezGame",
+  "description": "Platform top up game termurah, tercepat, dan terpercaya di Indonesia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#05070a",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
