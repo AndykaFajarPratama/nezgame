@@ -12,8 +12,8 @@ export class ApigameService {
   private baseUrl = "https://apigames.id";
 
   constructor() {
-    this.merchantId = env.APIGAME_MERCHANT_ID;
-    this.secretKey = env.APIGAME_SECRET_KEY;
+    this.merchantId = env.APIGAME_MERCHANT_ID.trim();
+    this.secretKey = env.APIGAME_SECRET_KEY.trim();
   }
 
   /**
