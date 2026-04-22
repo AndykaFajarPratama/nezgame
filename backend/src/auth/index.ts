@@ -67,7 +67,9 @@ export const auth = betterAuth({
       },
     },
   },
-  trustedOrigins: env.isProduction ? [env.APP_DOMAIN] : ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+  trustedOrigins: env.isProduction 
+    ? [env.APP_DOMAIN, env.FRONTEND_URL] 
+    : ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
 });
 
 export type Auth = typeof auth;
