@@ -187,6 +187,8 @@ export default function OrderModal({ category, onClose, initialData }: OrderModa
 
             <div className="flex gap-4">
               <input
+                id="targetId"
+                name="targetId"
                 type="text"
                 placeholder="Masukkan User ID..."
                 value={targetId}
@@ -195,6 +197,8 @@ export default function OrderModal({ category, onClose, initialData }: OrderModa
               />
               {needsZone && (
                 <input
+                  id="zoneId"
+                  name="zoneId"
                   type="text"
                   placeholder="Zone ID..."
                   value={zoneId}
