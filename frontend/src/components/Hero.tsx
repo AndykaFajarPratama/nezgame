@@ -180,8 +180,6 @@ export default function Hero() {
                   filter: isExcited
                     ? 'brightness(1.4) contrast(1.1) drop-shadow(0 0 35px rgba(34,211,238,0.6))'
                     : 'brightness(1.05) contrast(1.05) drop-shadow(0 0 20px rgba(59,130,246,0.3))',
-                  WebkitMaskImage: 'radial-gradient(circle, black 70%, transparent 100%)',
-                  maskImage: 'radial-gradient(circle, black 70%, transparent 100%)',
                   transition: 'filter 0.3s ease',
                 }}
               />
