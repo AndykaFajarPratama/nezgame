@@ -32,8 +32,6 @@ export default function Hero() {
   const springY = useSpring(mouseY, springConfig);
 
   // 3D transforms
-  const rotateX = useTransform(springY, [-0.5, 0.5], [12, -12]);
-  const rotateY = useTransform(springX, [-0.5, 0.5], [-12, 12]);
   const translateX = useTransform(springX, [-0.5, 0.5], [-20, 20]);
   const translateY = useTransform(springY, [-0.5, 0.5], [-15, 15]);
 
@@ -109,12 +107,11 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: 3D Interactive Mascot */}
+        {/* Right: Interactive Mascot */}
         <div
           ref={containerRef}
           className="flex-1 flex justify-center items-center mt-12 md:mt-0 relative cursor-pointer"
           onClick={handleClick}
-          style={{ perspective: "1000px" }}
         >
           {/* Dynamic glow that follows mouse */}
           <motion.div
@@ -145,22 +142,18 @@ export default function Hero() {
             )}
           </AnimatePresence>
 
-          {/* 3D Mascot */}
+          {/* Mascot */}
           <motion.div
             className="relative z-20"
             style={{
-              rotateX,
-              rotateY,
               x: translateX,
               y: translateY,
-              transformStyle: "preserve-3d",
-              mixBlendMode: "screen", // ✅ Pindahkan ke sini agar blend mode bekerja di luar konteks 3D
             }}
           >
             <motion.div
               animate={
                 isExcited
-                  ? { scale: [1, 1.18, 0.92, 1.06, 1], rotate: [0, -6, 6, -3, 0] }
+                  ? { scale: [1, 1.18, 0.92, 1.06, 1] }
                   : { y: [0, -10, 0] }
               }
               transition={
@@ -177,6 +170,7 @@ export default function Hero() {
                 className="w-full max-w-[280px] md:max-w-[420px] select-none pointer-events-none" 
                 draggable={false}
                 style={{ 
+                  mixBlendMode: "screen",
                   filter: isExcited
                     ? 'brightness(1.4) contrast(1.1)'
                     : 'brightness(1.05) contrast(1.05)',
