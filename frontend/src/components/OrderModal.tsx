@@ -163,9 +163,6 @@ export default function OrderModal({ category, onClose, initialData }: OrderModa
               className="w-32 h-32 rounded-2xl shadow-[0_0_30px_rgba(59,130,246,0.3)] mb-4 border border-white/10 object-cover"
             />
             <h3 className="text-2xl font-black mb-2">{category.name}</h3>
-            <span className="px-3 py-1 bg-green-500/10 text-green-400 text-xs font-bold rounded-lg border border-green-500/20 mb-4 inline-block">
-              Server Aktif
-            </span>
             <p className="text-sm text-slate-400 leading-relaxed">
               Top up otomatis 24/7. Transaksi diproses dalam hitungan detik setelah pembayaran dikonfirmasi.
             </p>

@@ -88,7 +88,7 @@ router.post("/api/validate/:slug", validateLimiter, async (req, res, next) => {
       } else {
         res.json({
           success: false,
-          message: "Akun tidak ditemukan atau ID salah."
+          message: check.error_msg || check.message || "Akun tidak ditemukan atau ID salah."
         });
       }
       return;
@@ -101,7 +101,7 @@ router.post("/api/validate/:slug", validateLimiter, async (req, res, next) => {
       if (formatRule.pattern.test(target_id)) {
         res.json({
           success: true,
-          nickname: `UID ${target_id} (Format Valid ✓)`,
+          nickname: `System Validasi: ID ${target_id} ✅`,
         });
       } else {
         res.json({
@@ -116,7 +116,7 @@ router.post("/api/validate/:slug", validateLimiter, async (req, res, next) => {
     console.log(`[Validate] No validation rule for slug: ${slug}, accepting target: ${target_id}`);
     res.json({
       success: true,
-      nickname: `ID ${target_id} (Diterima)`,
+      nickname: `System Validasi: ID ${target_id} ✅`,
     });
 
   } catch (error) {
