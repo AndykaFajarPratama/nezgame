@@ -1,7 +1,5 @@
 import express from "express";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
 import { env, validateEnv } from "./config/env.js";
 import { securityHeaders, errorHandler } from "./middleware/error.middleware.js";
 import morgan from "morgan";
@@ -20,13 +18,12 @@ import adminStatsRoutes from "./routes/admin.stats.js";
 validateEnv();
 
 const app = express();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ─── Middleware ────────────────────────────────────────────────
 app.use(
   cors({
-    origin: env.isProduction 
-      ? [env.APP_DOMAIN] 
+    origin: env.isProduction
+      ? [env.FRONTEND_URL] // ✅ DIUBAH: dari APP_DOMAIN ke FRONTEND_URL
       : ["http://localhost:5173", "http://localhost:3000", "http://localhost:5174"],
     credentials: true,
   })
@@ -39,8 +36,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan(env.isProduction ? "combined" : "dev"));
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: "Too many requests, please try again later." },
@@ -50,51 +47,23 @@ app.use(apiLimiter);
 
 // ─── Health Check ─────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
-  res.json({ 
-    status: "healthy", 
+  res.json({
+    status: "healthy",
     timestamp: new Date().toISOString(),
-    env: env.NODE_ENV 
+    env: env.NODE_ENV
   });
 });
 
 // ─── API Routes ───────────────────────────────────────────────
-// Auth (Custom routes first, then Better Auth fallback)
 app.use(customAuthRoutes);
 app.use(authRoutes);
-
-// Catalog (public)
 app.use(catalogRoutes);
-
-// Transactions (mixed auth)
-// Admin/Settings
 app.use(settingsRoutes);
 app.use(adminStatsRoutes);
 app.use(transactionRoutes);
-
-// Owner Dashboard (owner-only)
 app.use(ownerRoutes);
 
-// ─── Static Files (frontend) ─────────────────────────────────
-// Serve the frontend from the frontend/dist directory
-const frontendPath = path.resolve(__dirname, "../../frontend/dist");
-
-app.use(express.static(frontendPath));
-
-// SPA fallback: serve index.html for non-API routes
-app.get(/.*/, (req, res, next) => {
-  // Don't catch API routes or auth routes
-  if (req.path.startsWith("/api/")) {
-    next();
-    return;
-  }
-  
-  // Check if file exists, if not serve index.html (SPA routing)
-  res.sendFile(path.join(frontendPath, "index.html"), (err) => {
-    if (err) {
-      res.status(404).json({ success: false, message: "Page not found" });
-    }
-  });
-});
+// ✅ DIHAPUS: Static files & SPA fallback karena frontend sudah di Vercel
 
 // ─── Error Handler (must be last) ────────────────────────────
 app.use(errorHandler);
@@ -107,7 +76,7 @@ app.listen(env.PORT, () => {
 ╠══════════════════════════════════════════╣
 ║  Port:     ${String(env.PORT).padEnd(29)}║
 ║  Env:      ${env.NODE_ENV.padEnd(29)}║
-║  Frontend: ${frontendPath.substring(0, 29).padEnd(29)}║
+║  Frontend: ${env.FRONTEND_URL.substring(0, 29).padEnd(29)}║
 ╚══════════════════════════════════════════╝
   `);
 });

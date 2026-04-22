@@ -5,6 +5,7 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV || "development",
   PORT: parseInt(process.env.PORT || "3000", 10),
   APP_DOMAIN: process.env.APP_DOMAIN || "http://localhost:3000",
+  FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173", // ✅ DITAMBAH
 
   // Database
   DATABASE_URL: process.env.DATABASE_URL || "",
@@ -50,7 +51,7 @@ export function validateEnv() {
     "EMAILJS_PUBLIC_KEY",
     "EMAILJS_PRIVATE_KEY",
   ];
-  
+
   const missing = required.filter((key) => !process.env[key]);
   if (missing.length > 0) {
     console.error(`❌ CRITICAL: Missing required environment variables: ${missing.join(", ")}`);
