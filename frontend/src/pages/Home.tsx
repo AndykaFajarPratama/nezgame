@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
+import HeroScroll from "../components/HeroScroll";
 import GameList from "../components/GameList";
 import HowToOrder from "../components/HowToOrder";
 import Features from "../components/Features";
@@ -25,6 +26,7 @@ export default function Home() {
     <div className="min-h-screen text-slate-100 font-sans">
       <Navbar isScrolled={isScrolled} />
       <Hero />
+      <HeroScroll />
       <main className="max-w-7xl mx-auto px-6 space-y-32 py-16">
         <Features />
         <GameList />
