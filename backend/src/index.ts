@@ -45,13 +45,27 @@ const apiLimiter = rateLimit({
 });
 app.use(apiLimiter);
 
-// ─── Health Check ─────────────────────────────────────────────
+// ─── Health & IP Check ─────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
   res.json({
     status: "healthy",
     timestamp: new Date().toISOString(),
     env: env.NODE_ENV
   });
+});
+
+app.get("/api/ip", async (_req, res) => {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    res.json({
+      success: true,
+      server_ip: data.ip,
+      message: "Daftarkan IP ini ke dashboard Apigames Anda."
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Gagal mendapatkan IP server" });
+  }
 });
 
 // ─── API Routes ───────────────────────────────────────────────
