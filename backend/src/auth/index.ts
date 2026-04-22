@@ -70,6 +70,12 @@ export const auth = betterAuth({
   trustedOrigins: env.isProduction 
     ? [env.APP_DOMAIN, env.FRONTEND_URL] 
     : ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: env.isProduction ? "none" : "lax",
+      secure: env.isProduction,
+    },
+  },
 });
 
 export type Auth = typeof auth;

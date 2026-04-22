@@ -18,6 +18,7 @@ import adminStatsRoutes from "./routes/admin.stats.js";
 validateEnv();
 
 const app = express();
+app.set("trust proxy", 1); // Wajib agar secure cookie (SameSite=None) berfungsi di balik load balancer (Railway/Render)
 
 // ─── Middleware ────────────────────────────────────────────────
 app.use(
