@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import HeroScroll from "../components/HeroScroll";
+import InteractiveMascot from "../components/InteractiveMascot";
 import GameList from "../components/GameList";
 import HowToOrder from "../components/HowToOrder";
 import Features from "../components/Features";
@@ -31,6 +32,7 @@ export default function Home() {
         <Features />
         <GameList />
         <HowToOrder />
+        <InteractiveMascot />
         <TransactionChecker />
         <Testimonials />
         <FAQ />
