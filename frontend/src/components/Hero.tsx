@@ -154,6 +154,7 @@ export default function Hero() {
               x: translateX,
               y: translateY,
               transformStyle: "preserve-3d",
+              mixBlendMode: "screen", // ✅ Pindahkan ke sini agar blend mode bekerja di luar konteks 3D
             }}
           >
             <motion.div
@@ -176,7 +177,6 @@ export default function Hero() {
                 className="w-full max-w-[280px] md:max-w-[420px] select-none pointer-events-none" 
                 draggable={false}
                 style={{ 
-                  mixBlendMode: 'screen',
                   filter: isExcited
                     ? 'brightness(1.4) contrast(1.1)'
                     : 'brightness(1.05) contrast(1.05)',
