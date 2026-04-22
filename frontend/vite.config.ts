@@ -11,9 +11,7 @@ export default defineConfig({
     sourcemap: false, // Menyembunyikan source code asli dari inspect element
     minify: 'esbuild',
   },
-  esbuild: {
-    drop: ['console', 'debugger'], // Menghapus semua console.log di production
-  },
+
   server: {
     proxy: {
       '/api': {
