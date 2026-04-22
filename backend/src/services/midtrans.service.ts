@@ -9,8 +9,27 @@ export class MidtransService {
   private snap: InstanceType<typeof midtransClient.Snap>;
 
   constructor() {
+    // Validate keys exist
+    if (!env.MIDTRANS_SERVER_KEY || !env.MIDTRANS_CLIENT_KEY) {
+      console.error("❌ CRITICAL: Midtrans keys are missing! Check environment variables.");
+    }
+
+    // Detect key type vs isProduction mismatch
+    const serverKey = env.MIDTRANS_SERVER_KEY;
+    const isProduction = env.MIDTRANS_IS_PRODUCTION;
+
+    if (isProduction && serverKey.startsWith("SB-")) {
+      console.error("⚠️ WARNING: MIDTRANS_IS_PRODUCTION=true but using SANDBOX key! Switching to sandbox mode.");
+    }
+    if (!isProduction && !serverKey.startsWith("SB-")) {
+      console.error("⚠️ WARNING: MIDTRANS_IS_PRODUCTION=false but using PRODUCTION key! Switching to production mode.");
+    }
+
+    // Auto-detect mode from server key prefix to prevent 401 errors
+    const autoDetectProduction = !serverKey.startsWith("SB-");
+
     this.snap = new midtransClient.Snap({
-      isProduction: env.MIDTRANS_IS_PRODUCTION,
+      isProduction: autoDetectProduction,
       serverKey: env.MIDTRANS_SERVER_KEY,
       clientKey: env.MIDTRANS_CLIENT_KEY,
     });
@@ -48,7 +67,7 @@ export class MidtransService {
           id: orderId,
           price: Math.round(amount),
           quantity: 1,
-          name: productName,
+          name: productName.substring(0, 50), // Midtrans name max 50 chars
         },
       ],
       customer_details: {

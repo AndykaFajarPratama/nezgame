@@ -37,13 +37,10 @@ export class TransactionController {
    */
   async checkout(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(`[Checkout] Received request:`, JSON.stringify(req.body));
-
       const validated = checkoutSchema.safeParse(req.body);
       
       if (!validated.success) {
         const errorMsg = validated.error.issues[0].message;
-        console.log(`[Checkout] Validation failed: ${errorMsg}`);
         res.status(400).json({ success: false, error: errorMsg, message: errorMsg });
         return;
       }
@@ -56,7 +53,6 @@ export class TransactionController {
       });
 
       if (!product) {
-        console.log(`[Checkout] Product not found: ${sku_code}`);
         res.status(404).json({ success: false, error: "Product not found.", message: "Product not found." });
         return;
       }
@@ -65,12 +61,9 @@ export class TransactionController {
       const hargaJual = pricingService.calculateHargaJual(hargaModal, payment_method);
       const hargaJualStr = hargaJual.toString();
 
-      console.log(`[Checkout] Product: ${product.name} | Modal: ${hargaModal} | Jual: ${hargaJual} | Method: ${payment_method}`);
-
       // Midtrans minimum amount check (Rp 100)
       if (hargaJual < 100) {
         const msg = `Harga terlalu kecil untuk diproses (Rp ${hargaJual}). Minimum Rp 100.`;
-        console.log(`[Checkout] ${msg}`);
         res.status(400).json({ success: false, error: msg, message: msg });
         return;
       }
@@ -85,7 +78,6 @@ export class TransactionController {
       }
 
       const invoice = `INV-${uuidv4().replace(/-/g, "").substring(0, 8).toUpperCase()}`;
-      console.log(`[Checkout] Creating transaction: ${invoice} for ${target_id}`);
 
       // 1. Create Transaction record
       let newTrx;
@@ -109,16 +101,14 @@ export class TransactionController {
           })
           .returning();
         newTrx = inserted;
-        console.log(`[Checkout] Transaction created: ${invoice} (id: ${newTrx.id})`);
       } catch (dbError: any) {
-        console.error(`❌ [Checkout] DB insert error for ${invoice}:`, dbError.message);
-        res.status(500).json({ success: false, error: `Database error: ${dbError.message}`, message: "Gagal menyimpan transaksi." });
+        console.error(`❌ DB insert error for ${invoice}:`, dbError.message);
+        res.status(500).json({ success: false, error: "Gagal menyimpan transaksi.", message: "Gagal menyimpan transaksi." });
         return;
       }
 
       // 2. Request Midtrans Snap Token
       try {
-        console.log(`[Checkout] Requesting Midtrans Snap token for ${invoice} (amount: ${hargaJual})`);
         const payment = await midtransService.createTransaction(
           invoice,
           hargaJual,
@@ -127,8 +117,6 @@ export class TransactionController {
           validated.data.customer_email || "customer@example.com",
           payment_method
         );
-
-        console.log(`[Checkout] ✅ Snap token received for ${invoice}`);
 
         await db
           .update(transactions)
@@ -146,16 +134,16 @@ export class TransactionController {
           .set({ status: "FAILED" })
           .where(eq(transactions.id, newTrx.id));
 
-        const errMsg = paymentError?.message || paymentError?.ApiResponse?.status_message || "Unknown Midtrans error";
-        console.error(`❌ [Checkout] Midtrans error for ${invoice}:`, errMsg, paymentError);
+        const errMsg = paymentError?.message || paymentError?.ApiResponse?.status_message || "Unknown payment error";
+        console.error(`❌ Midtrans error for ${invoice}:`, errMsg);
         res.status(502).json({ 
           success: false, 
           error: `Payment gateway error: ${errMsg}`, 
-          message: `Gagal menghubungi payment gateway. ${errMsg}` 
+          message: `Gagal menghubungi payment gateway.` 
         });
       }
     } catch (error: any) {
-      console.error(`❌ [Checkout] Unhandled error:`, error.message, error.stack);
+      console.error(`❌ Checkout error:`, error.message);
       next(error);
     }
   }
