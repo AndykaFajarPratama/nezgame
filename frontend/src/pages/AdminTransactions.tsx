@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "../layouts/AdminLayout";
-import { 
-  History, 
-  Search, 
-  RefreshCw, 
+import { apiFetch } from "../lib/api"; // ✅ DITAMBAH
+import {
+  History,
+  Search,
+  RefreshCw,
   Clock,
   ExternalLink,
   RotateCcw
@@ -29,7 +30,7 @@ export default function AdminTransactions() {
 
   const fetchTransactions = async () => {
     try {
-      const res = await fetch("/api/admin/transactions");
+      const res = await apiFetch("/api/admin/transactions"); // ✅ DIUBAH
       const data = await res.json();
       setTransactions(data);
     } catch (err) {
@@ -41,8 +42,7 @@ export default function AdminTransactions() {
 
   useEffect(() => {
     fetchTransactions();
-    
-    // Setup polling every 10 seconds
+
     const interval = setInterval(() => {
       if (polling) fetchTransactions();
     }, 10000);
@@ -53,7 +53,7 @@ export default function AdminTransactions() {
   const handleRetry = async (invoice: string) => {
     if (!confirm(`Retry order ${invoice}?`)) return;
     try {
-      const res = await fetch(`/api/admin/transaction/${invoice}/retry`, { method: "POST" });
+      const res = await apiFetch(`/api/admin/transaction/${invoice}/retry`, { method: "POST" }); // ✅ DIUBAH
       const data = await res.json();
       if (data.success) {
         alert("Retry Success!");
@@ -77,7 +77,7 @@ export default function AdminTransactions() {
     }
   };
 
-  const filtered = transactions.filter(t => 
+  const filtered = transactions.filter(t =>
     (t.invoice_number?.toLowerCase() ?? "").includes(search.toLowerCase()) ||
     (t.target_id?.toLowerCase() ?? "").includes(search.toLowerCase())
   );
@@ -97,18 +97,17 @@ export default function AdminTransactions() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={() => setPolling(!polling)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-xs font-bold transition-all ${
-                polling 
-                ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/5" 
-                : "border-slate-700 text-slate-500 bg-transparent"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-xs font-bold transition-all ${polling
+                  ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/5"
+                  : "border-slate-700 text-slate-500 bg-transparent"
+                }`}
             >
               <div className={`w-2 h-2 rounded-full ${polling ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}`} />
               {polling ? "POLLING ACTIVE" : "POLLING PAUSED"}
             </button>
-            <button 
+            <button
               onClick={fetchTransactions}
               className="p-2.5 glass border border-white/10 rounded-lg hover:border-blue-500/50 transition-all"
             >
@@ -118,16 +117,16 @@ export default function AdminTransactions() {
         </div>
 
         <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-4 rounded-xl">
-           <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-black/20 rounded-lg border border-white/5 focus-within:border-blue-500/50 transition-all">
-             <Search className="w-4 h-4 text-slate-600" />
-             <input 
-               type="text" 
-               placeholder="Search by Invoice or Target ID..."
-               value={search}
-               onChange={(e) => setSearch(e.target.value)}
-               className="bg-transparent outline-none text-sm w-full"
-             />
-           </div>
+          <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-black/20 rounded-lg border border-white/5 focus-within:border-blue-500/50 transition-all">
+            <Search className="w-4 h-4 text-slate-600" />
+            <input
+              type="text"
+              placeholder="Search by Invoice or Target ID..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-transparent outline-none text-sm w-full"
+            />
+          </div>
         </div>
 
         <div className="glass rounded-2xl border border-white/5 overflow-hidden">
@@ -150,27 +149,27 @@ export default function AdminTransactions() {
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                   <td colSpan={5} className="px-6 py-20 text-center">
-                      <div className="flex flex-col items-center gap-4 opacity-50">
-                        <Clock className="w-12 h-12" />
-                        <p className="font-bold uppercase tracking-widest">No Recent Activity Detected</p>
-                      </div>
-                   </td>
+                  <td colSpan={5} className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center gap-4 opacity-50">
+                      <Clock className="w-12 h-12" />
+                      <p className="font-bold uppercase tracking-widest">No Recent Activity Detected</p>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 filtered.map((t) => (
                   <tr key={t.id} className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group">
                     <td className="px-6 py-6">
                       <div className="flex items-center gap-3">
-                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500/50 group-hover:bg-blue-400 transition-colors" />
-                         <div>
-                            <p className="text-xs text-slate-200 font-mono">
-                               {new Date(t.created_at).toLocaleTimeString()}
-                            </p>
-                            <p className="text-[10px] text-slate-600 uppercase">
-                               {new Date(t.created_at).toLocaleDateString()}
-                            </p>
-                         </div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/50 group-hover:bg-blue-400 transition-colors" />
+                        <div>
+                          <p className="text-xs text-slate-200 font-mono">
+                            {new Date(t.created_at).toLocaleTimeString()}
+                          </p>
+                          <p className="text-[10px] text-slate-600 uppercase">
+                            {new Date(t.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -191,23 +190,23 @@ export default function AdminTransactions() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                       {getStatusBadge(t.status)}
+                      {getStatusBadge(t.status)}
                     </td>
                     <td className="px-6 py-4">
-                       <div className="flex items-center gap-2">
-                          {t.status === 'FAILED' && (
-                            <button 
-                              onClick={() => handleRetry(t.invoice_number)}
-                              className="p-1.5 rounded bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-[0_0_10px_rgba(239,68,68,0.1)]"
-                              title="Retry Order"
-                            >
-                               <RotateCcw className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                          <button className="p-1.5 rounded bg-white/5 text-slate-400 hover:text-white transition-all">
-                             <ExternalLink className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-2">
+                        {t.status === 'FAILED' && (
+                          <button
+                            onClick={() => handleRetry(t.invoice_number)}
+                            className="p-1.5 rounded bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-[0_0_10px_rgba(239,68,68,0.1)]"
+                            title="Retry Order"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
                           </button>
-                       </div>
+                        )}
+                        <button className="p-1.5 rounded bg-white/5 text-slate-400 hover:text-white transition-all">
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

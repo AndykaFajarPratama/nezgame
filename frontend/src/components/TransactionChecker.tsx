@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { apiFetch } from "../lib/api"; // ✅ DITAMBAH
 
 interface TransactionStatus {
   invoice_number: string;
@@ -24,7 +25,7 @@ export default function TransactionChecker() {
     setResult(null);
 
     try {
-      const res = await fetch(`/api/transaction/${invoice}`);
+      const res = await apiFetch(`/api/transaction/${invoice}`); // ✅ DIUBAH
       const data = await res.json();
       if (res.ok) {
         setResult(data);
@@ -57,7 +58,7 @@ export default function TransactionChecker() {
       <div className="max-w-2xl mx-auto">
         <div className="bg-[#0d121b] border border-white/5 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 filter blur-3xl -mr-32 -mt-32 rounded-full"></div>
-          
+
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row gap-4 mb-8">
               <input

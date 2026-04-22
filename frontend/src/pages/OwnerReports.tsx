@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import OwnerLayout from "../layouts/OwnerLayout";
+import { apiFetch } from "../lib/api"; // ✅ DITAMBAH
 import {
   FileBarChart,
   Search,
@@ -74,7 +75,7 @@ export default function OwnerReports() {
       if (toDate) params.set("to", toDate);
       if (search) params.set("search", search);
 
-      const res = await fetch(`/api/owner/transactions-report?${params}`);
+      const res = await apiFetch(`/api/owner/transactions-report?${params}`); // ✅ DIUBAH
       if (res.ok) {
         setData(await res.json());
       } else {
@@ -105,13 +106,7 @@ export default function OwnerReports() {
     setData({
       transactions: mockTrx,
       pagination: { page: 1, limit: 25, total: 452, totalPages: 19 },
-      summary: {
-        totalRevenue: 12450000,
-        totalCost: 10200000,
-        totalProfit: 2250000,
-        avgOrderValue: 27544,
-        totalFiltered: 452,
-      },
+      summary: { totalRevenue: 12450000, totalCost: 10200000, totalProfit: 2250000, avgOrderValue: 27544, totalFiltered: 452 },
     });
   };
 
@@ -124,16 +119,9 @@ export default function OwnerReports() {
     if (!data?.transactions.length) return;
     const headers = ["Invoice", "Target ID", "SKU", "Modal", "Jual", "Profit", "Status", "Date"];
     const rows = data.transactions.map((t) => [
-      t.invoice_number,
-      t.target_id,
-      t.product_sku,
-      t.hargaModal,
-      t.hargaJual,
-      t.hargaJual - t.hargaModal,
-      t.status,
-      new Date(t.created_at).toLocaleString("id-ID"),
+      t.invoice_number, t.target_id, t.product_sku, t.hargaModal, t.hargaJual,
+      t.hargaJual - t.hargaModal, t.status, new Date(t.created_at).toLocaleString("id-ID"),
     ]);
-
     const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -147,16 +135,11 @@ export default function OwnerReports() {
   const getStatusBadge = (status: string) => {
     const base = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border";
     switch (status.toUpperCase()) {
-      case "SUCCESS":
-        return <span className={`${base} text-emerald-400 border-emerald-500/50 bg-emerald-500/10`}>{status}</span>;
-      case "PAID":
-        return <span className={`${base} text-blue-400 border-blue-500/50 bg-blue-500/10`}>{status}</span>;
-      case "UNPAID":
-        return <span className={`${base} text-amber-400 border-amber-500/50 bg-amber-500/10`}>{status}</span>;
-      case "FAILED":
-        return <span className={`${base} text-rose-400 border-rose-500/50 bg-rose-500/10`}>{status}</span>;
-      default:
-        return <span className={`${base} text-slate-400 border-slate-500/50 bg-slate-500/10`}>{status}</span>;
+      case "SUCCESS": return <span className={`${base} text-emerald-400 border-emerald-500/50 bg-emerald-500/10`}>{status}</span>;
+      case "PAID": return <span className={`${base} text-blue-400 border-blue-500/50 bg-blue-500/10`}>{status}</span>;
+      case "UNPAID": return <span className={`${base} text-amber-400 border-amber-500/50 bg-amber-500/10`}>{status}</span>;
+      case "FAILED": return <span className={`${base} text-rose-400 border-rose-500/50 bg-rose-500/10`}>{status}</span>;
+      default: return <span className={`${base} text-slate-400 border-slate-500/50 bg-slate-500/10`}>{status}</span>;
     }
   };
 
@@ -201,7 +184,6 @@ export default function OwnerReports() {
             Filters
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Search */}
             <div className="lg:col-span-2 flex items-center gap-2 bg-black/30 border border-white/5 rounded-lg px-3 py-2 focus-within:border-amber-500/50 transition-all">
               <Search className="w-4 h-4 text-slate-600" />
               <input
@@ -214,7 +196,6 @@ export default function OwnerReports() {
               />
             </div>
 
-            {/* Status */}
             <select
               value={status}
               onChange={(e) => { setStatus(e.target.value); setPage(1); }}
@@ -227,26 +208,14 @@ export default function OwnerReports() {
               ))}
             </select>
 
-            {/* Date From */}
             <div className="flex items-center gap-2 bg-black/30 border border-white/5 rounded-lg px-3 py-2 focus-within:border-amber-500/50 transition-all">
               <Calendar className="w-4 h-4 text-slate-600 shrink-0" />
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
-                className="bg-transparent outline-none text-sm w-full text-white"
-              />
+              <input type="date" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setPage(1); }} className="bg-transparent outline-none text-sm w-full text-white" />
             </div>
 
-            {/* Date To */}
             <div className="flex items-center gap-2 bg-black/30 border border-white/5 rounded-lg px-3 py-2 focus-within:border-amber-500/50 transition-all">
               <Calendar className="w-4 h-4 text-slate-600 shrink-0" />
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e) => { setToDate(e.target.value); setPage(1); }}
-                className="bg-transparent outline-none text-sm w-full text-white"
-              />
+              <input type="date" value={toDate} onChange={(e) => { setToDate(e.target.value); setPage(1); }} className="bg-transparent outline-none text-sm w-full text-white" />
             </div>
           </div>
 
@@ -287,80 +256,50 @@ export default function OwnerReports() {
               <tbody>
                 {loading
                   ? Array.from({ length: 8 }).map((_, i) => (
-                      <tr key={i} className="border-b border-white/[0.02]">
-                        <td colSpan={9} className="px-6 py-4">
-                          <div className="h-10 skeleton-text rounded w-full" />
-                        </td>
-                      </tr>
-                    ))
+                    <tr key={i} className="border-b border-white/[0.02]">
+                      <td colSpan={9} className="px-6 py-4">
+                        <div className="h-10 skeleton-text rounded w-full" />
+                      </td>
+                    </tr>
+                  ))
                   : (data?.transactions || []).map((t) => {
-                      const profit = t.hargaJual - t.hargaModal;
-                      return (
-                        <tr
-                          key={t.id}
-                          className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors"
-                        >
-                          <td className="px-6 py-4">
-                            <div>
-                              <p className="text-xs text-slate-200 font-mono">
-                                {new Date(t.created_at).toLocaleDateString("id-ID")}
-                              </p>
-                              <p className="text-[10px] text-slate-600">
-                                {new Date(t.created_at).toLocaleTimeString("id-ID")}
-                              </p>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-xs font-bold text-white font-mono uppercase">
-                              {t.invoice_number}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-xs text-slate-300 font-mono">
-                              {t.target_id}
-                            </p>
-                            {t.zone_id && (
-                              <p className="text-[10px] text-slate-600">
-                                Zone: {t.zone_id}
-                              </p>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-xs text-slate-300 font-mono uppercase">
-                              {t.product_sku}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-xs text-slate-400 font-mono">
-                              {formatRupiah(t.hargaModal)}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-xs text-white font-bold font-mono">
-                              {formatRupiah(t.hargaJual)}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p
-                              className={`text-xs font-bold font-mono ${
-                                profit > 0 ? "text-emerald-400" : "text-rose-400"
-                              }`}
-                            >
-                              {profit > 0 ? "+" : ""}
-                              {formatRupiah(profit)}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-xs text-slate-400 uppercase">
-                              {t.payment_method}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            {getStatusBadge(t.status)}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    const profit = t.hargaJual - t.hargaModal;
+                    return (
+                      <tr key={t.id} className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
+                        <td className="px-6 py-4">
+                          <div>
+                            <p className="text-xs text-slate-200 font-mono">{new Date(t.created_at).toLocaleDateString("id-ID")}</p>
+                            <p className="text-[10px] text-slate-600">{new Date(t.created_at).toLocaleTimeString("id-ID")}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-xs font-bold text-white font-mono uppercase">{t.invoice_number}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-xs text-slate-300 font-mono">{t.target_id}</p>
+                          {t.zone_id && <p className="text-[10px] text-slate-600">Zone: {t.zone_id}</p>}
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-xs text-slate-300 font-mono uppercase">{t.product_sku}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-xs text-slate-400 font-mono">{formatRupiah(t.hargaModal)}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-xs text-white font-bold font-mono">{formatRupiah(t.hargaJual)}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className={`text-xs font-bold font-mono ${profit > 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                            {profit > 0 ? "+" : ""}{formatRupiah(profit)}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-xs text-slate-400 uppercase">{t.payment_method}</p>
+                        </td>
+                        <td className="px-6 py-4">{getStatusBadge(t.status)}</td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
@@ -368,38 +307,24 @@ export default function OwnerReports() {
           {/* Pagination */}
           <div className="flex items-center justify-between px-6 py-4 border-t border-white/5">
             <div className="flex items-center gap-4">
-              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
-                Rows per page
-              </span>
+              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Rows per page</span>
               <select
                 value={limit}
                 onChange={(e) => { setLimit(parseInt(e.target.value)); setPage(1); }}
                 className="bg-black/30 border border-white/5 rounded px-2 py-1 text-xs text-white outline-none"
               >
                 {[10, 25, 50, 100].map((v) => (
-                  <option key={v} value={v} className="bg-[#0d121b]">
-                    {v}
-                  </option>
+                  <option key={v} value={v} className="bg-[#0d121b]">{v}</option>
                 ))}
               </select>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-500">
-                Page {p?.page || 1} of {p?.totalPages || 1}
-              </span>
-              <button
-                onClick={() => setPage(Math.max(1, page - 1))}
-                disabled={page <= 1}
-                className="p-1.5 rounded bg-white/5 text-slate-400 hover:text-white disabled:opacity-30 transition-all"
-              >
+              <span className="text-xs text-slate-500">Page {p?.page || 1} of {p?.totalPages || 1}</span>
+              <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="p-1.5 rounded bg-white/5 text-slate-400 hover:text-white disabled:opacity-30 transition-all">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button
-                onClick={() => setPage(Math.min(p?.totalPages || 1, page + 1))}
-                disabled={page >= (p?.totalPages || 1)}
-                className="p-1.5 rounded bg-white/5 text-slate-400 hover:text-white disabled:opacity-30 transition-all"
-              >
+              <button onClick={() => setPage(Math.min(p?.totalPages || 1, page + 1))} disabled={page >= (p?.totalPages || 1)} className="p-1.5 rounded bg-white/5 text-slate-400 hover:text-white disabled:opacity-30 transition-all">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -410,36 +335,14 @@ export default function OwnerReports() {
   );
 }
 
-function SummaryMini({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: string;
-  color: string;
-}) {
-  const borderColors: Record<string, string> = {
-    amber: "border-amber-500/20",
-    emerald: "border-emerald-500/20",
-    blue: "border-blue-500/20",
-    purple: "border-purple-500/20",
-  };
-  const textColors: Record<string, string> = {
-    amber: "text-amber-400",
-    emerald: "text-emerald-400",
-    blue: "text-blue-400",
-    purple: "text-purple-400",
-  };
+function SummaryMini({ label, value, color }: { label: string; value: string; color: string; }) {
+  const borderColors: Record<string, string> = { amber: "border-amber-500/20", emerald: "border-emerald-500/20", blue: "border-blue-500/20", purple: "border-purple-500/20" };
+  const textColors: Record<string, string> = { amber: "text-amber-400", emerald: "text-emerald-400", blue: "text-blue-400", purple: "text-purple-400" };
 
   return (
     <div className={`owner-card p-4 rounded-xl border ${borderColors[color]}`}>
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-        {label}
-      </p>
-      <p className={`text-lg font-heading font-black ${textColors[color]}`}>
-        {value}
-      </p>
+      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{label}</p>
+      <p className={`text-lg font-heading font-black ${textColors[color]}`}>{value}</p>
     </div>
   );
 }

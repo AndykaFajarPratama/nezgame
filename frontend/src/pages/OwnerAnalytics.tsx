@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import OwnerLayout from "../layouts/OwnerLayout";
+import { apiFetch } from "../lib/api"; // ✅ DITAMBAH
 import {
   TrendingUp,
   Target,
@@ -120,16 +121,15 @@ export default function OwnerAnalytics() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/owner/analytics?range=${range}`);
+      const res = await apiFetch(`/api/owner/analytics?range=${range}`); // ✅ DIUBAH
       if (res.ok) {
         const data = await res.json();
-        // Add margin to daily data
         data.dailyData = data.dailyData.map((d: any) => ({
           ...d,
           margin:
             d.revenue > 0
               ? Math.round(((d.revenue - d.cost) / d.revenue) * 100 * 100) /
-                100
+              100
               : 0,
         }));
         setAnalytics(data);
@@ -181,11 +181,10 @@ export default function OwnerAnalytics() {
               <button
                 key={r}
                 onClick={() => setRange(r)}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
-                  range === r
+                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${range === r
                     ? "bg-amber-500/20 text-amber-400 border border-amber-500/50"
                     : "bg-white/5 text-slate-500 border border-white/5 hover:text-white hover:bg-white/10"
-                }`}
+                  }`}
               >
                 {r}
               </button>
@@ -236,7 +235,7 @@ export default function OwnerAnalytics() {
           </div>
         </div>
 
-        {/* Profit Margin Trend - Line Chart */}
+        {/* Profit Margin Trend */}
         <div className="owner-card rounded-2xl p-8 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] -z-10 group-hover:bg-emerald-500/10 transition-all duration-700" />
           <div className="flex items-center justify-between mb-8">
@@ -297,7 +296,7 @@ export default function OwnerAnalytics() {
           </div>
         </div>
 
-        {/* Revenue vs Cost vs Profit - Composed Chart */}
+        {/* Revenue vs Cost vs Profit */}
         <div className="owner-card rounded-2xl p-8 relative overflow-hidden group">
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500/5 blur-[100px] -z-10" />
           <div className="flex items-center justify-between mb-8">
@@ -317,23 +316,9 @@ export default function OwnerAnalytics() {
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={dailyData}>
                   <defs>
-                    <linearGradient
-                      id="gradProfit2"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="0%"
-                        stopColor="#10b981"
-                        stopOpacity={0.3}
-                      />
-                      <stop
-                        offset="100%"
-                        stopColor="#10b981"
-                        stopOpacity={0}
-                      />
+                    <linearGradient id="gradProfit2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
@@ -361,37 +346,16 @@ export default function OwnerAnalytics() {
                     iconSize={8}
                     wrapperStyle={{ fontSize: "11px", color: "#64748b" }}
                   />
-                  <Bar
-                    dataKey="revenue"
-                    name="Revenue"
-                    fill="#f59e0b"
-                    opacity={0.7}
-                    radius={[3, 3, 0, 0]}
-                    barSize={8}
-                  />
-                  <Bar
-                    dataKey="cost"
-                    name="Cost"
-                    fill="#334155"
-                    opacity={0.8}
-                    radius={[3, 3, 0, 0]}
-                    barSize={8}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="profit"
-                    name="Profit"
-                    stroke="#10b981"
-                    strokeWidth={2}
-                    fill="url(#gradProfit2)"
-                  />
+                  <Bar dataKey="revenue" name="Revenue" fill="#f59e0b" opacity={0.7} radius={[3, 3, 0, 0]} barSize={8} />
+                  <Bar dataKey="cost" name="Cost" fill="#334155" opacity={0.8} radius={[3, 3, 0, 0]} barSize={8} />
+                  <Area type="monotone" dataKey="profit" name="Profit" stroke="#10b981" strokeWidth={2} fill="url(#gradProfit2)" />
                 </ComposedChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
 
-        {/* Top Products by Profit */}
+        {/* Top Products */}
         <div className="owner-card rounded-2xl p-8">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -416,10 +380,7 @@ export default function OwnerAnalytics() {
                 </tr>
               </thead>
               <tbody>
-                {(loading
-                  ? Array.from({ length: 5 })
-                  : topProducts
-                ).map((product: any, i) => {
+                {(loading ? Array.from({ length: 5 }) : topProducts).map((product: any, i) => {
                   if (loading) {
                     return (
                       <tr key={i} className="border-b border-white/[0.02]">
@@ -436,16 +397,9 @@ export default function OwnerAnalytics() {
                   const maxProfit = topProducts[0]?.profit || 1;
                   const barWidth = (product.profit / maxProfit) * 100;
                   return (
-                    <tr
-                      key={i}
-                      className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group"
-                    >
+                    <tr key={i} className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group">
                       <td className="py-4 pr-6">
-                        <span
-                          className={`text-xs font-black ${
-                            i < 3 ? "text-amber-400" : "text-slate-600"
-                          }`}
-                        >
+                        <span className={`text-xs font-black ${i < 3 ? "text-amber-400" : "text-slate-600"}`}>
                           {i + 1}
                         </span>
                       </td>

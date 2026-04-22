@@ -3,11 +3,12 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import StatusTimeline from "../components/StatusTimeline";
 import OrderModal from "../components/OrderModal";
-import { 
-  History, 
-  ArrowRight, 
-  RefreshCcw, 
-  ChevronDown, 
+import { apiFetch } from "../lib/api"; // ✅ DITAMBAH
+import {
+  History,
+  ArrowRight,
+  RefreshCcw,
+  ChevronDown,
   ExternalLink,
   Package,
   Calendar,
@@ -36,12 +37,9 @@ export default function CustomerDashboard() {
   const [orders, setOrders] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
-  
-  // For Repeat Order Modal
+
   const [repeatCategory, setRepeatCategory] = useState<any>(null);
   const [repeatData, setRepeatData] = useState<any>(null);
-
-  // For Accordion / Expanded Detail
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -56,7 +54,7 @@ export default function CustomerDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("/api/user/orders");
+      const res = await apiFetch("/api/user/orders"); // ✅ DIUBAH
       if (res.ok) {
         const data = await res.json();
         setOrders(data);
@@ -70,7 +68,7 @@ export default function CustomerDashboard() {
 
   const handleRepeatOrder = (order: Transaction) => {
     if (!order.categorySlug) return;
-    
+
     setRepeatCategory({
       name: order.categoryName || "Game",
       slug: order.categorySlug,
@@ -101,9 +99,8 @@ export default function CustomerDashboard() {
   return (
     <div className="min-h-screen bg-[#05070a] text-slate-100 font-sans">
       <Navbar isScrolled={true} />
-      
+
       <main className="max-w-5xl mx-auto px-6 py-32">
-        {/* Header Section */}
         <div className="mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -116,7 +113,6 @@ export default function CustomerDashboard() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="space-y-6">
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
@@ -137,27 +133,26 @@ export default function CustomerDashboard() {
             orders.map((order) => {
               const config = getStatusConfig(order.status);
               const isExpanded = expandedId === order.id;
-              
+
               return (
-                <div 
-                  key={order.id} 
-                  className={`bg-[#0d121b] border transition-all duration-300 rounded-3xl overflow-hidden group ${
-                    isExpanded ? "border-blue-500/40 shadow-2xl shadow-blue-500/5" : "border-white/5 hover:border-white/10"
-                  }`}
+                <div
+                  key={order.id}
+                  className={`bg-[#0d121b] border transition-all duration-300 rounded-3xl overflow-hidden group ${isExpanded ? "border-blue-500/40 shadow-2xl shadow-blue-500/5" : "border-white/5 hover:border-white/10"
+                    }`}
                 >
-                  <div 
+                  <div
                     className="p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6"
                     onClick={() => setExpandedId(isExpanded ? null : order.id)}
                   >
                     <div className="flex items-center gap-5">
                       <div className="relative">
-                        <img 
-                          src={order.categoryImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(order.categoryName || "?")}&background=1e293b&color=38bdf8&bold=true&size=128`} 
+                        <img
+                          src={order.categoryImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(order.categoryName || "?")}&background=1e293b&color=38bdf8&bold=true&size=128`}
                           className="w-16 h-16 rounded-2xl object-cover border border-white/10"
                           alt={order.categoryName || "Game"}
                         />
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-[#0d121b] border border-white/10 flex items-center justify-center">
-                           <config.icon className={`w-3.5 h-3.5 ${config.color.split(' ')[0]}`} />
+                          <config.icon className={`w-3.5 h-3.5 ${config.color.split(' ')[0]}`} />
                         </div>
                       </div>
                       <div>
@@ -184,25 +179,23 @@ export default function CustomerDashboard() {
                     </div>
                   </div>
 
-                  {/* Expanded Content */}
                   <div className={`transition-all duration-500 overflow-hidden ${isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
                     <div className="px-8 pb-8 pt-2 space-y-8 border-t border-white/5">
-                      {/* Timeline */}
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500/80 mb-6">Status Real-Time</p>
                         <StatusTimeline status={order.status} />
                       </div>
 
                       <div className="flex flex-wrap gap-4 pt-6">
-                        <button 
+                        <button
                           onClick={() => handleRepeatOrder(order)}
                           className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-blue-500 hover:text-white transition-all group"
                         >
                           <RefreshCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
                           Repeat Order
                         </button>
-                        <button 
-                          onClick={() => window.open(`/api/transaction/${order.invoiceNumber}`, '_blank')}
+                        <button
+                          onClick={() => window.open(`${import.meta.env.VITE_API_BASE_URL || ""}/api/transaction/${order.invoiceNumber}`, '_blank')} // ✅ DIUBAH
                           className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-white/10 transition-all"
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -219,13 +212,13 @@ export default function CustomerDashboard() {
       </main>
 
       {repeatCategory && (
-        <OrderModal 
-          category={repeatCategory} 
+        <OrderModal
+          category={repeatCategory}
           initialData={repeatData}
           onClose={() => {
             setRepeatCategory(null);
             setRepeatData(null);
-          }} 
+          }}
         />
       )}
 

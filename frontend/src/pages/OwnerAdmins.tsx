@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import OwnerLayout from "../layouts/OwnerLayout";
+import { apiFetch } from "../lib/api"; // ✅ DITAMBAH
 import {
   Users,
   UserPlus,
@@ -46,7 +47,7 @@ export default function OwnerAdmins() {
   const fetchAdmins = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/owner/admins");
+      const res = await apiFetch("/api/owner/admins"); // ✅ DIUBAH
       if (res.ok) {
         setAdmins(await res.json());
       } else {
@@ -101,7 +102,7 @@ export default function OwnerAdmins() {
     setFormSuccess(null);
 
     try {
-      const res = await fetch("/api/owner/admins", {
+      const res = await apiFetch("/api/owner/admins", { // ✅ DIUBAH
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -139,7 +140,7 @@ export default function OwnerAdmins() {
       return;
 
     try {
-      const res = await fetch(`/api/owner/admins/${admin.id}`, {
+      const res = await apiFetch(`/api/owner/admins/${admin.id}`, { // ✅ DIUBAH
         method: "DELETE",
       });
       const data = await res.json();
@@ -243,77 +244,76 @@ export default function OwnerAdmins() {
               <tbody>
                 {loading
                   ? Array.from({ length: 3 }).map((_, i) => (
-                      <tr key={i} className="border-b border-white/[0.02]">
-                        <td colSpan={6} className="px-6 py-5">
-                          <div className="h-12 skeleton-text rounded w-full" />
-                        </td>
-                      </tr>
-                    ))
+                    <tr key={i} className="border-b border-white/[0.02]">
+                      <td colSpan={6} className="px-6 py-5">
+                        <div className="h-12 skeleton-text rounded w-full" />
+                      </td>
+                    </tr>
+                  ))
                   : admins.map((admin) => (
-                      <tr
-                        key={admin.id}
-                        className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group"
-                      >
-                        <td className="px-6 py-5">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-                                admin.roleName === "owner"
-                                  ? "bg-amber-500/10 border-amber-500/20"
-                                  : "bg-blue-500/10 border-blue-500/20"
+                    <tr
+                      key={admin.id}
+                      className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group"
+                    >
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center border ${admin.roleName === "owner"
+                                ? "bg-amber-500/10 border-amber-500/20"
+                                : "bg-blue-500/10 border-blue-500/20"
                               }`}
-                            >
-                              {admin.roleName === "owner" ? (
-                                <Crown className="w-5 h-5 text-amber-400" />
-                              ) : (
-                                <User className="w-5 h-5 text-blue-400" />
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold text-white">
-                                {admin.name}
-                              </p>
-                              <p className="text-[10px] text-slate-600 font-mono">
-                                ID: {admin.id.substring(0, 12)}...
-                              </p>
-                            </div>
+                          >
+                            {admin.roleName === "owner" ? (
+                              <Crown className="w-5 h-5 text-amber-400" />
+                            ) : (
+                              <User className="w-5 h-5 text-blue-400" />
+                            )}
                           </div>
-                        </td>
-                        <td className="px-6 py-5">
-                          <p className="text-sm text-slate-300">{admin.email}</p>
-                        </td>
-                        <td className="px-6 py-5">{getRoleBadge(admin.roleName)}</td>
-                        <td className="px-6 py-5">
-                          <span className="text-sm text-slate-400 font-mono">
-                            {admin.sessionCount}
+                          <div>
+                            <p className="text-sm font-bold text-white">
+                              {admin.name}
+                            </p>
+                            <p className="text-[10px] text-slate-600 font-mono">
+                              ID: {admin.id.substring(0, 12)}...
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <p className="text-sm text-slate-300">{admin.email}</p>
+                      </td>
+                      <td className="px-6 py-5">{getRoleBadge(admin.roleName)}</td>
+                      <td className="px-6 py-5">
+                        <span className="text-sm text-slate-400 font-mono">
+                          {admin.sessionCount}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5">
+                        <p className="text-xs text-slate-400">
+                          {new Date(admin.createdAt).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </td>
+                      <td className="px-6 py-5">
+                        {admin.roleName === "owner" ? (
+                          <span className="text-[10px] text-slate-700 italic font-bold uppercase">
+                            Protected
                           </span>
-                        </td>
-                        <td className="px-6 py-5">
-                          <p className="text-xs text-slate-400">
-                            {new Date(admin.createdAt).toLocaleDateString("id-ID", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </td>
-                        <td className="px-6 py-5">
-                          {admin.roleName === "owner" ? (
-                            <span className="text-[10px] text-slate-700 italic font-bold uppercase">
-                              Protected
-                            </span>
-                          ) : (
-                            <button
-                              onClick={() => handleDelete(admin)}
-                              className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
-                              title="Remove Admin"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                        ) : (
+                          <button
+                            onClick={() => handleDelete(admin)}
+                            className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                            title="Remove Admin"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -328,7 +328,6 @@ export default function OwnerAdmins() {
             onClick={() => !formLoading && setShowModal(false)}
           />
           <div className="relative w-full max-w-md owner-glass p-8 rounded-3xl border border-amber-500/20 shadow-[0_0_60px_rgba(245,158,11,0.1)]">
-            {/* Close */}
             <button
               onClick={() => !formLoading && setShowModal(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/10 transition-all"
