@@ -114,7 +114,7 @@ export default function OrderModal({ category, onClose, initialData }: OrderModa
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Gagal membuat transaksi");
+        throw new Error(data.error || data.message || "Gagal membuat transaksi");
       }
 
       onClose();
@@ -140,7 +140,7 @@ export default function OrderModal({ category, onClose, initialData }: OrderModa
     } catch (err: any) {
       setErrorText(err.message);
     } finally {
-      if (processing) setProcessing(false);
+      setProcessing(false);
     }
   };
 
