@@ -171,15 +171,14 @@ export default function Hero() {
               whileTap={{ scale: 0.9 }}
             >
               <img 
-                src="/images/nez_mascot_black.png" 
+                src="/images/nez_mascot_v2.png" 
                 alt="Nez Mascot" 
                 className="w-full max-w-[280px] md:max-w-[420px] select-none pointer-events-none" 
                 draggable={false}
                 style={{ 
-                  mixBlendMode: 'screen',
                   filter: isExcited
-                    ? 'brightness(1.4) contrast(1.1) drop-shadow(0 0 35px rgba(34,211,238,0.6))'
-                    : 'brightness(1.05) contrast(1.05) drop-shadow(0 0 20px rgba(59,130,246,0.3))',
+                    ? 'brightness(1.2) drop-shadow(0 0 35px rgba(34,211,238,0.6))'
+                    : 'drop-shadow(0 0 20px rgba(59,130,246,0.3))',
                   transition: 'filter 0.3s ease',
                 }}
               />

@@ -8,8 +8,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
-    sourcemap: false, // Menyembunyikan source code asli dari inspect element
-    minify: 'esbuild',
+    sourcemap: false,
   },
 
   server: {
