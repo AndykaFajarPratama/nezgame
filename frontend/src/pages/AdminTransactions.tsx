@@ -32,7 +32,12 @@ export default function AdminTransactions() {
     try {
       const res = await apiFetch("/api/admin/transactions"); // ✅ DIUBAH
       const data = await res.json();
-      setTransactions(data);
+      if (res.ok && Array.isArray(data)) {
+        setTransactions(data);
+      } else {
+        setTransactions([]);
+        console.error("API Error:", data);
+      }
     } catch (err) {
       console.error("Failed to fetch transactions");
     } finally {
