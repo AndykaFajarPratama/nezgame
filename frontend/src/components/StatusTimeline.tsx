@@ -1,4 +1,3 @@
-import React from "react";
 import { Check, Clock, CreditCard, PackageCheck, AlertCircle } from "lucide-react";
 
 type OrderStatus = "UNPAID" | "PAID" | "SUCCESS" | "FAILED";

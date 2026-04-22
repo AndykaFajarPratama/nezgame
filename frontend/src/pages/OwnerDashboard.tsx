@@ -4,7 +4,6 @@ import {
   DollarSign,
   TrendingUp,
   ShoppingCart,
-  Users,
   Crown,
   ArrowUpRight,
   ArrowDownRight,

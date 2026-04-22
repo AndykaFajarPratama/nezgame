@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { authClient } from "../lib/auth-client";
 import { Lock, ArrowRight, AlertCircle, RefreshCw, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 
@@ -10,7 +10,6 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   // Better Auth usually passes the token in the URL or handles it automatically if configured

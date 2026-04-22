@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
-import PromoMarquee from "../components/PromoMarquee";
 import GameList from "../components/GameList";
 import HowToOrder from "../components/HowToOrder";
 import Features from "../components/Features";

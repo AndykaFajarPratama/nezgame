@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "../layouts/AdminLayout";
 import { 
   RefreshCw, 
@@ -25,21 +25,18 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [search, setSearch] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
   const fetchProducts = async () => {
     try {
       setLoading(true);
       // Fetching from a general products endpoint
       // We'll use the one we created or a specific admin list if available
-      const res = await fetch("/api/admin/transactions"); // Placeholder: we actually need a product list
+      await fetch("/api/admin/transactions"); // Placeholder: we actually need a product list
       // Wait, let's use the catalog API but we might need a specific admin one for modal prices
       const resp = await fetch("/api/products/mobile-legends"); // Example slug
       const data = await resp.json();
       setProducts(data);
-      setError(null);
     } catch (err) {
-      setError("Failed to link with Central Database.");
+      console.error("Failed to link with Central Database.");
     } finally {
       setLoading(false);
     }

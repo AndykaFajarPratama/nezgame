@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { authClient } from "../lib/auth-client";
-import { CheckCircle2, XCircle, RefreshCw, Mail } from "lucide-react";
+import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 
 export default function EmailVerification() {
   const [searchParams] = useSearchParams();
@@ -9,8 +9,8 @@ export default function EmailVerification() {
   const token = searchParams.get("token");
 
   useEffect(() => {
-    if (token) {
-      authClient.verifyEmail({ token })
+    if (token && typeof token === "string") {
+      authClient.verifyEmail({ query: { token } })
         .then(({ error }) => {
           if (error) setStatus("error");
           else setStatus("success");

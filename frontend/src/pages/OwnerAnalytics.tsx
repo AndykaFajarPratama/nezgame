@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import OwnerLayout from "../layouts/OwnerLayout";
 import {
   TrendingUp,
-  ArrowUpRight,
   Target,
   Percent,
   BarChart3,
@@ -10,7 +9,6 @@ import {
 import {
   LineChart,
   Line,
-  BarChart,
   Bar,
   XAxis,
   YAxis,
